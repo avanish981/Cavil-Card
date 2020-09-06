@@ -1,0 +1,15 @@
+<h1>{{ complain.title}}</h1>
+<ul>
+    {{complain.details}}
+</ul>
+
+<hr>
+
+<a href="{% url 'comportal:add-comment' pk=complain.pk %}">add</a>
+{% for post in complain.comments.all %}
+
+<p> {{post.text|linebreaks}}</p>
+{% empty %}
+<p> no comments </p>
+
+{% endfor %}

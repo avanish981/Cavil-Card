@@ -1,0 +1,76 @@
+
+{% extends "comportal/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+<div class="col-md-8">
+    <h1>{{ complain.title|title}}
+        {% if priority %}
+            <a href= "{% url "comportal:prioritize" pk=complain.id %}"> 
+                <span class="glyphicon glyphicon-star-empty" aria-hidden="true"> 
+            </a>
+        {% else %}
+            <span class="glyphicon glyphicon-star" aria-hidden="true"> 
+        {% endif %}
+        {% if user.get_username == complain.by.username %}
+            <a href= "{% url "comportal:update-complain" pk=complain.id %}"> 
+                <span class="glyphicon glyphicon-pencil" aria-hidden="true"> 
+            </a>
+            <a href= "{% url "comportal:delete-complain" pk=complain.id %}"> 
+                <span class="glyphicon glyphicon-trash" > 
+            </a>
+        {% endif%}
+            <a href= "{% url "comportal:complain-pdf" pk=complain.id %}"> 
+                <span class="glyphicon glyphicon-file" aria-hidden="true"> 
+            </a> 
+    </h1>
+    <ul>
+        <a href="{% url 'comportal:user-complains' complain.by %}" >By: {{ complain.by }}</a><br>
+        <ul class="text-muted">{{ complain.pub_date|date:"F d, Y" }}</ul><br>
+        {{complain.details}}
+        {% lorem %}
+    </ul>
+    {% if user.admin == complain.area %}
+        {% if  complain.status == 0 %}
+        <a href="{% url 'comportal:process' complain.id %}" ><button class="btn-primary">take action</button></a>
+        {% elif complain.status == 1 %}
+        <a href="{% url 'comportal:done' complain.id %}" ><button class="btn-success">resolved</button></a>
+        {% else %}
+        <button class="btn-outline-primary">Complain resolved</button>
+        {% endif %}
+    {% else %}
+        {% if  complain.status == 0 %}
+        <button class="btn-primary">No action yet taken</button>
+        {% elif complain.status == 1 %}
+        <button class="btn-success">In process</button>
+        {% else %}
+        <button class="btn-primary">Complain resolved</button>
+        {% endif %}
+    {% endif %}
+    <hr>
+    {% if user.admin == complain.area or user.get_username == complain.by %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Discussion</h3>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% for post in complain.comments.all %}
+                    <button type="button" class="list-group-item">{{post.text|safe|linebreaks}}</button>
+                    {% endfor %}
+                
+                {% if discuss %}
+                    <form method="POST" >
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-success">send</button>
+                    </form>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

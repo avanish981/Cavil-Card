@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Cavil Card{% endblock %}</title>
+    {% load static %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'comportal/style.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{%  static 'favicon.ico' %}"/>
+    <link rel="stylesheet" href="{% static 'comportal/bootstrap-3.3.7-dist/css/bootstrap.min.css' %}">
+    <link rel="icon" type="image/jpg" href="/static/comportal/favicon.jpg">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="{% static 'comportal/bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+
+                <!-- Header -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavBar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{% url 'comportal:index' %}">Cavil Card</a>
+                </div>
+
+                <!-- Items -->
+                <div class="collapse navbar-collapse" id="topNavBar">
+                    <ul class="nav navbar-nav">
+                        <li><a href="{% url 'comportal:index' %}"><span class="glyphicon glyphicon-modal-window" aria-hidden="true"></span>&nbsp; Complaints</a></li>
+                        <!-- {% comment %} <li class="0{% block songs_active %}{% endblock %}"><a href="{% url 'music:songs' 'all' %}"><span class="glyphicon glyphicon-music" aria-hidden="true"></span>&nbsp; Songs</a></li> {% endcomment %} -->
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sort By <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <div class="panel panel-default">
+                                    <!-- <div class="panel-heading">Area</div> -->
+                                    <div class="panel-body">
+                                        <a href="{% url "comportal:index-hostel" %}">Hostel</a><br>
+                                        <a href="{% url "comportal:index-academics" %}">Academics</a><br>
+                                        <!-- <a href="{% url "comportal:index-colony" %}">Colony</a><br> -->
+                                    </div>
+                                </div>
+                                </li>
+
+                                <!-- <li>
+                                    <div class="panel panel-default">
+                                    <div class="panel-heading">Type</div>
+                                    <div class="panel-body">
+                                        <a href="{% url "comportal:index-green" %}">Ramanujam Hostel</a><br>
+                                        <a href="{% url "comportal:index-electrical" %}">Old Vs Hostel</a><br>
+                                        <a href="{% url "comportal:index-civil" %}">Raman Hostel</a><br>
+                                    </div>
+                                </div>
+                                </li> -->
+
+
+                            </ul>
+                        </li>
+                    </ul>
+                    <!-- <form class="navbar-form navbar-left" role="search" method="get" action="{% url 'comportal:index' %}">
+                        <div class="form-group">
+                            <input type="text" class="form-control" size ="40" name="q" value="{{ request.GET.q }}">
+                        </div>
+                        <button type="submit" class="btn btn-default">Search</button>
+                    </form> -->
+                    {% if user.is_authenticated%}
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a data-toggle="modal" href="#myModal" class="button">
+                                    <span class="glyphicon glyphicon-bell" aria-hidden="true"></span>
+                                    {% if user.notifications%}
+                                        <span class="badge">{{user.notifications}}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users_auth:user-profile' %}">
+                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp; Hello {{user.get_username}}
+
+                                </a>
+                            </li>
+                            <li>
+                                {% if user.admin == 'N'%}
+
+                                <a href=admin>
+                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp; Admin Section
+                                </a>
+                                {% else %}
+                                {% endif %}
+                            </li>
+                            <li>
+                                <a href="{% url 'comportal:newcomplain' %}">
+                                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp; Add Complaint
+                                </a>
+                            </li>
+                            <li>
+
+                                <a href="{% url 'logout' %}">
+                                    <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp; Logout
+                                </a>
+                            </li>
+                        </ul>
+                    {% else %}
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a href="{% url 'users_auth:register' %}">
+                                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp; Signup
+                                </a>
+                            </li>
+
+                            <li>
+
+                                <a href="{% url 'login' %}">
+                                    <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp; Login
+                                </a>
+                            </li>
+                            {% comment %} <li><a data-toggle="modal" data-target="#myModal" ><Notifications</a></li> {% endcomment %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+            </div>
+        </nav>
+    </header>
+    <main role="main" class="container">
+      <div class="row">
+        {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade in">
+                {{ message }}
+              </div>
+            {% endfor %}
+        {% endif %}
+          {% block content %}{% endblock %}
+
+      </div>
+      <hr>
+      <hr>
+      {% if is_paginated %}
+
+      {% if page_obj.has_previous %}
+        <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+      {% endif %}
+
+    {% endif %}
+    </main>
+    <hr>
+    <hr>
+    {% if user.is_authenticated%}
+    <!--Modal-->
+    <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Notifications</h4>
+        </div>
+        <div class="modal-body">
+        <ul>
+        {% comment %} {% with request.user.noti_messages|split : "$" as notifications %}
+          {% for noti in notifications%}
+            <li>
+            {{noti}}
+            </li>
+
+          {% endfor %}
+        {% endwith %} {% endcomment %}
+
+        {{request.user.noti_messages|safe }}
+
+
+        </ul>
+        </div>
+        <div class="modal-footer">
+
+          <a class="btn btn-primary" href="{% url 'users_auth:clear-noti' request.user.id %}">Clear All Notifications</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  {% endif %}
+</body>
+
+</html>

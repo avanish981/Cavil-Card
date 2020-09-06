@@ -1,0 +1,79 @@
+{% extends "comportal/base.html" %}
+{% block content %}
+{% comment %} <a href="{% url 'comportal:newcomplain' %}"><button>add </button></a><br>
+<a href="/comportal/hostel"><button>hostel </button></a><br>
+<a href="/comportal/academics"><button>academics </button></a><br>
+<a href="/comportal/colony"><button>colony </button></a><br>
+<a href="{% url 'comportal:index' %}"><button>all </button></a><br> {% endcomment %}
+{% comment %} {% if user.is_authenticated %}
+<a href="{% url 'users_auth:user-profile' %}">  {{ user.get_username }}</a>
+{% endif %} {% endcomment %}
+<div class="row">
+        <div class="col-md-8">
+
+            {% if complain_list %}
+                <ul>
+                    {% for complain in complain_list %}
+                        <div class="media">
+                            <div class="media-left media-top">
+                                <a href="{% url 'comportal:user-complains' complain.by %}">
+                                   <img class="rounded-circle" src="{{ complain.by.image.url }}" style= "width: 100px; height: 100px;">
+
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading"><a href="{% url 'comportal:detail' complain.id %}">{{ complain.title|title }}</a></h4>
+                                <small >author : {{ complain.by }}</small><br>
+                                <small class="text-muted">date : {{ complain.pub_date|date:"F d, Y" }}</small><br>
+                                {% if  complain.status == 0 %}
+                                <button class="btn-primary">No action yet taken</button>
+                                {% elif complain.status == 1 %}
+                                <button class="btn-success">In process</button>
+                                {% else %}
+                                <button class="btn-primary">Complain resolved</button>
+                                {% endif %}
+                                <p>desc : {{ complain.details }}</p>
+                                {% lorem %}
+                            </div>
+                            <hr>
+                            <hr>
+                        </div>
+
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <h3> no complains </h3>
+            {% endif %}
+
+        </div>
+        <div class="col-md-4">
+          <div class="content-section">
+            <h3>Order By</h3>
+            <p class='text-muted'>you can sort by
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-light">
+                <a href="{% url "comportal:index-recents" %}">Recent</a>
+                <span class="badge">5</span></li>
+                <li class="list-group-item list-group-item-light">
+                <a href="{% url "comportal:index-last" %}">Last</a>
+                <span class="badge">5</span></li>
+                <li class="list-group-item list-group-item-light">
+                <a href="{% url "comportal:index-priority" %}">Priority</a>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">staus</div>
+                        <div class="panel-body">
+                            <a href="{% url "comportal:index-unprocessed" %}">New</a><br>
+                            <a href="{% url "comportal:index-processing" %}">In Process</a><br>
+                            <a href="{% url "comportal:index-resolved" %}">resolved</a><br>
+                        </div>
+                    </div>
+                </li>
+              </ul>
+            </p>
+          </div>
+        </div>
+
+
+{% endblock %}
